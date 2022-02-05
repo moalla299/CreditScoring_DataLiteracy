@@ -151,24 +151,6 @@ plt.rcParams.update(fonts.neurips2021())
 plt.show()
 
 
-"""
-These plots are ugly(!!!!!!!!!!!!!!)
-and the fairness is droped from this work 
-
-Distributions of various variables
-Categorical data: 
-BAD = HmeqDF["BAD"].value_counts()
-HmeqDF["BAD"].value_counts().plot(kind= "barh")
-
-Reason
-Reason = HmeqDF["REASON"].value_counts()
-HmeqDF["REASON"].value_counts().plot(kind= "barh")
-
-What ever is the reason of geting a credit is our model fair for both type of reasons?
-Depending on their inbalanced distribution, will my model allocate fair budget to each group, since we cannot judge
-who face the most essential need for the loan.
-"""
-
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Categorical Variables Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #Reason
 #Converting REASON to dummy variables 
