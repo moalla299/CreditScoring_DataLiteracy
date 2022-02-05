@@ -24,7 +24,6 @@ import os
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Directory %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 os.getcwd()
 os.chdir('/Users/nikki/Desktop/QDS_Tuebingen/3-Winter2021/Data Literacy/Project/CreditScoring_DataLiteracy')
-#import mpu.ml
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
@@ -195,80 +194,3 @@ cor = HmeqDF_dropna.corr()
 #Write the clean dataset into a CSV file 
 HmeqDF_dropna.to_csv('HmeqFinal.csv',index=False)
 
-
-
-
-
-
-
-
-#plt.pyplot.xlim(-50,50)
-DebtInc.plot.kde()
-
-#Scatter Plot
-%matplotlib inline
-x = DebtInc
-y = range(len(DebtInc))
-plt.scatter(x, y, c=y, cmap='Spectral')
-plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':100})
-plt.colorbar()
-plt.title('Debt to Income Ratio')
-plt.xlabel('DebtInc')
-plt.ylabel('Frequency')
-plt.show()
-
-
-#sns.jointplot(x,y, kind="hist") "It is not bad if xlim will be more limited"
-#sns.jointplot(x,y, kind="hex") #It is not bad if xlim will be more limited
-fig, ax = plt.subplots()
-sns.jointplot(x,y, kind="hist", color="c") 
-ax.set_xlim(0,100)
-ax.set_xticks(range(0,100))
-plt.show()
-
-g = sns.jointplot()
-sns.scatterplot(x= x, y= y, ec="c", fc="none", linewidth= 0.5, ax=g.ax_joint)
-sns.histplot(x=x, fill= False, linewidth=2 , ax=g.ax_marg_x, color=("c"))
-
-
-
-#All the attempt for encoding the JOB, 
-#because its content were sting it was problematic that I could not use MPU package. Yet I couldn't solve it 
-"""import numpy as np
-nb_classes = 6
-x = np.array(HmeqDF["JOB"]).reshape(-1)
-one_hot_targets = np.eye(nb_classes)[x]
-
-from sklearn.preprocessing import OrdinalEncoder
-enc = OrdinalEncoder()
-
-X = [['Other', 1], ['ProfExe', 2], ['Office', 3], ['Mgr', 4], ['Self', 5], ['Sales', 6]]
-enc.fit(X)
-OrdinalEncoder()
-enc.transform([['ProfExe', 3], ['Office', 1]])
-
-
-
-enc = OrdinalEncoder()
-X = [['Male', 1], ['Female', 3], ['Female', 2]]
-enc.fit(X)
-OrdinalEncoder()
-enc.categories_
-
-enc.transform([['Female', 3], ['Male', 1]])
-array([[0., 2.],
-       [1., 0.]])
-
-HmeqDF["JOB"] = mpu.ml.indices2one_hot(len(HmeqDF["JOB"][:]), nb_classes=6)
-len(HmeqDF["JOB"][1200])"""
-
-
-"""Nominal data like REASON and JOB should be coded in a way that we can use them in pur model:
-    1hot Encoding or categorical indexing 0-5..."""
-"""The other discussable point here is: Is really category "Other" provide any helpful data for our model???"""
-
-
-#Feature Importance 
-
-#Correlations
-Correl = HmeqDF.corr()['BAD'].sort_values()
