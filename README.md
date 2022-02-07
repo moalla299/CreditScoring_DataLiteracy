@@ -1,7 +1,7 @@
 # CreditScoring_DataLiteracy
 
 
-# Sensitivity of Credit Scoring in case of Machine Learning Utilization
+## Sensitivity of Credit Scoring in case of Machine Learning Utilization
 
 Zahra Moalleh
 
@@ -11,7 +11,7 @@ Zahra.moalleh@student.uni-tuebingen.de
 									 
 
 
-## Abstract
+### Abstract
 
 Credit Scoring is a tough subject in Banking & Financial Sector. A variety of statistical approaches are applied to estimate the expected loss and credit risk through client credit evaluation. This procedure is sensitive since incorrect scoring can overstate the risk of default and exacerbate a financial institution’s credit risk, which can lead to bankruptcy.
 
