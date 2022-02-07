@@ -5,8 +5,7 @@ Created on Mon Jan 24 18:10:36 2022
 
 @author: nikki
 """
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Libraries %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Libraries %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,57 +14,50 @@ import tueplots
 from tueplots import bundles, axes
 from tueplots import fonts, fontsizes
 #from tueplots import figsizes
-from tueplots import cycler
 from tueplots.constants import markers
 from tueplots.constants.color import palettes
 import csv
 import os
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Directory %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Font & Figuresize Check %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+fonts.neurips2021()
+fontsizes.neurips2021()
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Directory %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 os.getcwd()
-os.chdir('/Users/nikki/Desktop/QDS_Tuebingen/3-Winter2021/Data Literacy/Project/CreditScoring_DataLiteracy')
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-
+MyDir = "/Users/nikki/Desktop/QDS_Tuebingen/3-Winter2021/Data Literacy/Project/CreditScoring_DataLiteracy"
+os.chdir(MyDir)
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data Set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #Import Data
 HmeqDF = pd.read_csv('/Users/nikki/Desktop/QDS_Tuebingen/3-Winter2021/Data Literacy/Project/DataSet/hmeq.csv')
-
 #DataSet Information
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Insight into the data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 HmeqDF.info()
-
 """
-Except BAD & LOAN columns other columns have missing values. 
-Moreover, REASON & JOB are object(String) that should be fixed. (?????????????????????????)
+apart for the "BAD" and "LOAN" features, all other features contain missing values.
+Moreover, REASON & JOB are object(String) that should be fixed.
 """
-
-#Missing Values 
+#Brief descriptive Statistics 
+HmeqDF.describe()
+"""
+We got some statistical overview of the data
+"""
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Missing Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 MissingData = HmeqDF.isnull().sum().rename_axis('Variables').reset_index(name='Missing Values') 
 MissPerc = HmeqDF.isnull().sum()/(len(HmeqDF))*100
 MissPerc = MissPerc.sort_values(ascending=False)
-
 """
-PAPER::::: Depending on Missing Percentage of each column's data, we can coclude that DEBTINC has the most missing values, 
-On the other hand we guess depending on the meaning of this variable; it will play a major role in our classifying model. 
-Later we will investigate the Feature importance and see whether it is important or not (???????????????????)
-So depending on importance of some features and the huge amount of missing values, droping rows with missing values might
-be not a good idea. 
+Depending on Missing Percentage of each column's data, we saw that DEBTINC has the most missing values, 
+On the other hand we guess depending on the context of this variable; it will play a major role in our classifying model. 
+Later we will investigate the Feature importance and see the results
 
-NOW because it is out of this study scope we ignore the missing values. 
+**Filling the missing values is out of this study scope, we just dropped them**
 """
 #Dropna Dataset
 HmeqDF_dropna = HmeqDF.dropna()
 MissingData_dropna = HmeqDF_dropna.isnull().sum().rename_axis('Variables').reset_index(name='Missing Values') 
-
 """
 Here we see that only 56% of the data will remains if we drop rowa with missing values
 """
-#Brief descriptive Statistics 
-HmeqDF.describe()
-
-"""
-We got some statistical overview of the data
-"""
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Variables' Distribution %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #Columns Count Values
 columnNames = pd.Series(HmeqDF.columns.values)
 #Dependent Variable 
@@ -84,24 +76,10 @@ HmeqDF['CLAGE'].value_counts()
 HmeqDF['NINQ'].value_counts()  
 HmeqDF['CLNO'].value_counts()  
 HmeqDF['DEBTINC'].value_counts()
-
 """
 We got some insights about each variable and if they are imbalanced or have outlaiers
 """
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Each Variable Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-#Check required fonts and fontsizes for the plots
-fonts.neurips2021()
-fontsizes.neurips2021()
-
-#Dataset Variables
-columnNames = pd.Series(HmeqDF.columns.values)
-
-#BAD 
-#HmeqDF["BAD"].apply(pd.to_numeric)
-#type (HmeqDF["BAD"][1])
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plots %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% All Features Plots %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #BAD & REASON  
 sns.factorplot(x='BAD', col = 'REASON',kind='violin', data=HmeqDF) #NOT INFORMATIVE 
 sns.factorplot(x='BAD', col = 'REASON',kind='count', data=HmeqDF)
@@ -117,8 +95,7 @@ ax = sns.swarmplot( x = HmeqDF_dropna["BAD"], y = HmeqDF_dropna["VALUE"], palett
 #BAD & YOJ 
 ax = sns.swarmplot( x = HmeqDF_dropna["BAD"], y = HmeqDF_dropna["YOJ"], palette="CMRmap", size=3) 
 """Nice one decide to include it depending on feature importance results
-   you can ad a distribution to the plot 
-   The more the Years at present job, The less the probability of defult
+   **Feature Importance Results were not in alignment with this standpoint. 
 """
 #BAD & DEROG 
 ax = sns.swarmplot( x = HmeqDF_dropna["BAD"][:1000], y = HmeqDF_dropna["DEROG"][:1000], palette="CMRmap", size=3) # Decide later
@@ -132,47 +109,38 @@ ax = sns.swarmplot( x = HmeqDF_dropna["BAD"], y = HmeqDF_dropna["NINQ"], palette
 #BAD & CLNO 
 ax = sns.swarmplot( x = HmeqDF_dropna["BAD"], y = HmeqDF_dropna["CLNO"], palette="CMRmap", size=1) # Decide later
 #BAD & DebtInc 
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Debt-to-Inc Ratio %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #Calculating the maximum amount of DebtInc ratio for settled Credits   
 SettledDF = HmeqDF [HmeqDF["BAD"] == 0]
 MAXSettledDebtInc = SettledDF["DEBTINC"].max()
-
+#Limiting the Y axis to 60 for better visualization
+HmeqTest = HmeqDF_dropna[HmeqDF_dropna["DEBTINC"] <= 60]
 #with plt.rc_context(bundles.neurips2021()):
-style = dict(size=7, color='black')
-ax = sns.swarmplot(x = HmeqDF_dropna["BAD"],  y = HmeqDF_dropna["DEBTINC"], palette="CMRmap",size=3)
-ax.set_xlabel("Customer default or serious delinquency" ,fontsize=9)
-ax.set_ylabel("Debt to income ratio", fontsize= 9)
-ax.legend([" Settled Credit", " Default or serious Delinquency"], fontsize= 7)
+style = dict(size=14 , color='black')
+sns.set(rc={"figure.figsize":(12, 9)}, font='Times New Roman') 
+ax = sns.swarmplot(x = HmeqTest["BAD"],  y = HmeqTest["DEBTINC"],palette="CMRmap", size=4)
+ax.set_xlabel("Probability of Default or Serious Delinquency (BAD)" ,fontsize=16)
+ax.set_ylabel("Debt-to-Income Ratio (DEBTINC)", fontsize= 16)
+ax.legend([" Settled Credit (Class 0)", " Default or Serious Delinquency (Class 1)"], fontsize= 16)
 ax.axhline(MAXSettledDebtInc, color = "gray", linestyle = '--')
 ax.text(0.45 , MAXSettledDebtInc + 1.5 , "45.56", **style)
-#sns.set_palette("colorblind")
-plt.figure(figsize=(6,6))   
-plt.rcParams.update(fonts.neurips2021())
-plt.show()
-
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Categorical Variables Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
-#Reason
-#Converting REASON to dummy variables 
+plt.savefig("Figure00000.png", format="png", dpi=1200)
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Categorical Variables Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+#Reason: Converting to dummy variables 
 REASON_dummies = pd.get_dummies(HmeqDF_dropna['REASON'], prefix = 'REAS')
 HmeqDF_dropna.drop('REASON', axis=1, inplace = True)
 HmeqDF_dropna["REAS_DebtCon"] = REASON_dummies ["REAS_DebtCon"]
 HmeqDF_dropna["REAS_HomeImp"] = REASON_dummies ["REAS_HomeImp"]
-
-
-#JOB
-#JOB variable incoding 
+#JOB: Frequency encoding 
 HmeqDF_dropna['JOB'].value_counts()
-#Incoding depend on the Frequency
 mapper = {'Sales':0, 'Self': 1, 'Mgr': 2, 'Office': 3,  'ProfExe':4, 'Other':5 } 
 data['JOB'].replace(mapper, inplace = True)
 HmeqDF_dropna['JOB'].replace(mapper, inplace = True)
 HmeqDF_dropna['JOB'].value_counts()
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Final Processed Dataset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #Information regarding the Final Preproccesed Dataset 
 HmeqDF_dropna.info()
 cor = HmeqDF_dropna.corr()
-
 #Write the clean dataset into a CSV file 
 HmeqDF_dropna.to_csv('HmeqFinal.csv',index=False)
 
